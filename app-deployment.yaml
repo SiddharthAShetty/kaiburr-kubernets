@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task-app
+  template:
+    metadata:
+      labels:
+        app: task-app
+    spec:
+      containers:
+        - name: task-app
+          image: siddharthashetty19/kaiburr-task-app:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGO_URI
+              value: mongodb://mongo:27017/tasksdb
+            - name: RUN_MODE
+              value: "k8s"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: task-app-service
+spec:
+  selector:
+    app: task-app
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
